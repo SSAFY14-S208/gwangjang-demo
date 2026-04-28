@@ -31,6 +31,25 @@ pnpm start
 pnpm lint
 ```
 
+## Archived Vite Demos
+
+Two standalone Vite/Three.js demos are included under `demos/`.
+
+```bash
+pnpm demo:v1:install
+pnpm demo:v1:dev
+pnpm demo:v1:build
+
+pnpm demo:v2:install
+pnpm demo:v2:dev
+pnpm demo:v2:build
+```
+
+- `demos/v1`: Nemonic World Demo V1, default preview port `4174`
+- `demos/v2`: Nemonic World Demo V2, default preview port `4173`
+
+Generated folders such as `node_modules`, `dist`, `output`, Playwright cache, and logs were intentionally excluded.
+
 ## Source Reference
 
 이 레포는 `SSAFY14-S208/nemonic-prototype`의 `apps/prototype-next`를 출발점으로 만들었습니다.

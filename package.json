@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "demo:v1:install": "cd demos/v1 && npm install",
+    "demo:v1:dev": "cd demos/v1 && npm run dev -- --host 127.0.0.1 --port 4174",
+    "demo:v1:build": "cd demos/v1 && npm run build",
+    "demo:v2:install": "cd demos/v2 && npm install",
+    "demo:v2:dev": "cd demos/v2 && npm run dev -- --host 127.0.0.1 --port 4173",
+    "demo:v2:build": "cd demos/v2 && npm run build"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
