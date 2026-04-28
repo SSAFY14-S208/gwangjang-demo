@@ -11,38 +11,32 @@
     <div id="app">
       <div class="viewer-shell">
         <header class="viewer-copy">
-          <p class="eyebrow">인터랙티브 오브젝트</p>
-          <h1>네모닉 월드</h1>
+          <p class="eyebrow">하루에 한 번, 네모닉 운세</p>
+          <h1>오늘의 운세</h1>
           <p class="description">
-            가운데 오브젝트를 좌우로 드래그해 돌려보고, 마우스 휠로 확대하거나 축소해보세요.
-            아래 색상 버튼을 누르면 해당 파트가 정면으로 이동합니다.
+            생년월일시를 넣고 네모닉이 건네는 오늘의 운세 카드를 받아보는 작은 부스입니다.
           </p>
         </header>
         <main class="viewer-stage">
           <canvas id="scene"></canvas>
         </main>
         <footer class="viewer-controls">
-          <div class="platform-buttons" aria-label="색상 파트 보기">
-            <button class="platform-button" data-angle="-2.794" data-platform="green" type="button">
-              초록
+          <div class="platform-buttons" aria-label="콘텐츠 보기">
+            <button class="platform-button" data-angle="-2.794" data-content="community" data-platform="green" type="button">
+              커뮤니티
             </button>
-            <button class="platform-button" data-angle="1.679" data-platform="purple" type="button">
-              보라
+            <button class="platform-button is-active" data-angle="1.679" data-content="fortune" data-platform="purple" type="button">
+              운세
             </button>
-            <button class="platform-button is-active" data-angle="0.51" data-platform="coral" type="button">
-              코랄
+            <button class="platform-button" data-angle="0.51" data-content="relay" data-platform="coral" type="button">
+              릴레이
             </button>
-            <button class="platform-button" data-angle="-0.904" data-platform="blue" type="button">
-              파랑
+            <button class="platform-button" data-angle="-0.904" data-content="infinite" data-platform="blue" type="button">
+              무한
             </button>
-            <button class="platform-button" data-angle="-1.645" data-platform="yellow" type="button">
-              노랑
+            <button class="platform-button" data-angle="-1.645" data-content="flipbook" data-platform="yellow" type="button">
+              플립북
             </button>
-          </div>
-          <div class="viewer-hint">
-            <span>좌우 드래그</span>
-            <span>휠 줌</span>
-            <span>Y축 고정</span>
           </div>
         </footer>
       </div>
