@@ -1,15 +1,19 @@
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css");
+@import url("https://fonts.googleapis.com/css2?family=Jua&display=swap");
+@import url("https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css");
 
 :root {
   color-scheme: light;
+  --ink: #fff6ed;
+  --warm-ink: rgba(255, 245, 230, 0.82);
+  --soft-border: rgba(255, 232, 213, 0.18);
+  --soft-shadow: rgba(11, 8, 34, 0.32);
   font-family:
-    "Pretendard Variable",
-    "Pretendard",
+    "Paperlogy",
     "Noto Sans KR",
     sans-serif;
   background:
-    radial-gradient(circle at top, #fffdfb 0%, #f8f1fa 48%, #ece7f5 100%);
-  color: #241f17;
+    linear-gradient(180deg, #101229 0%, #1c1a3c 42%, #34274f 72%, #4b3b68 100%);
+  color: var(--ink);
 }
 
 * {
@@ -32,6 +36,9 @@ body {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 92%, rgba(255, 215, 169, 0.24) 0%, rgba(255, 215, 169, 0.12) 28%, rgba(255, 215, 169, 0) 58%),
+    linear-gradient(180deg, #111329 0%, #1b1a3b 48%, #33284f 76%, #493962 100%);
 }
 
 .viewer-copy {
@@ -39,49 +46,96 @@ body {
   top: clamp(1.1rem, 4vh, 2.6rem);
   left: 50%;
   z-index: 3;
-  width: min(40rem, calc(100% - 2rem));
+  width: min(46rem, calc(100% - 2rem));
   transform: translateX(-50%);
   display: grid;
-  gap: 0.6rem;
+  gap: 0.62rem;
   text-align: center;
+  justify-items: center;
+  filter: drop-shadow(0 14px 24px rgba(7, 6, 24, 0.3));
   transition:
-    opacity 180ms ease,
-    transform 180ms ease;
+    opacity 380ms ease,
+    transform 380ms ease;
 }
 
 .viewer-copy.is-swapping {
-  opacity: 0.35;
-  transform: translateX(-50%) translateY(-0.25rem);
+  opacity: 0.2;
+  transform: translateX(-50%) translateY(-0.45rem);
 }
 
 .eyebrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.9rem;
   margin: 0;
-  font-size: 0.85rem;
+  padding: 0.38rem 1rem;
+  border: 1px solid rgba(255, 236, 218, 0.22);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 245, 229, 0.1));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    0 8px 18px rgba(9, 7, 30, 0.18);
+  color: rgba(255, 238, 221, 0.78);
+  font-size: clamp(0.76rem, 1.1vw, 0.88rem);
+  font-weight: 400;
   letter-spacing: 0;
-  color: #8f8777;
+  white-space: nowrap;
+  backdrop-filter: blur(14px);
+}
+
+.eyebrow::before,
+.eyebrow::after {
+  content: "";
+  width: 0.7rem;
+  height: 1px;
+  border-radius: 999px;
+  background: rgba(255, 238, 221, 0.34);
+  box-shadow: none;
+}
+
+.eyebrow::before {
+  margin-right: 0.52rem;
+}
+
+.eyebrow::after {
+  margin-left: 0.52rem;
 }
 
 .viewer-copy h1 {
   margin: 0;
-  font-size: clamp(2.8rem, 6vw, 5.8rem);
-  line-height: 0.92;
+  color: var(--ink);
+  font-family:
+    "Jua",
+    "Paperlogy",
+    "Noto Sans KR",
+    sans-serif;
+  font-size: clamp(3.05rem, 6vw, 5.9rem);
+  line-height: 0.96;
   letter-spacing: 0;
-  font-weight: 700;
+  font-weight: 400;
+  text-shadow:
+    0 2px 0 rgba(90, 65, 112, 0.44),
+    0 14px 28px rgba(2, 2, 18, 0.34);
 }
 
 .description {
   margin: 0;
-  max-width: 42rem;
+  max-width: 35rem;
   justify-self: center;
-  color: #5e5549;
-  font-size: 1rem;
-  line-height: 1.7;
+  color: var(--warm-ink);
+  font-size: clamp(0.98rem, 1.28vw, 1.08rem);
+  font-weight: 300;
+  line-height: 1.68;
   word-break: keep-all;
+  text-shadow: none;
 }
 
 .viewer-stage {
   position: absolute;
   inset: 0;
+  z-index: 1;
 }
 
 .viewer-stage::before {
@@ -90,8 +144,8 @@ body {
   inset: 16% 12% 14%;
   border-radius: 999px;
   background:
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 62%);
-  filter: blur(22px);
+    radial-gradient(circle at center, rgba(255, 244, 226, 0.42), rgba(255, 244, 226, 0) 64%);
+  filter: blur(28px);
 }
 
 #scene {
@@ -120,93 +174,120 @@ body {
 .platform-buttons {
   display: flex;
   justify-content: center;
-  gap: 0.75rem;
+  gap: clamp(0.52rem, 1vw, 0.78rem);
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .platform-button {
   appearance: none;
-  border: 1px solid rgba(122, 112, 93, 0.14);
-  background: rgba(255, 255, 255, 0.76);
-  color: #5e5549;
-  padding: 0.8rem 1rem;
+  position: relative;
+  min-width: 4.95rem;
+  min-height: 2.78rem;
+  border: 1px solid var(--chip-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.68), var(--chip-bg));
+  color: var(--chip-text);
+  padding: 0.64rem 1.02rem 0.68rem;
   border-radius: 999px;
   font: inherit;
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 500;
   letter-spacing: 0;
   cursor: pointer;
   transition:
-    transform 160ms ease,
-    background-color 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    box-shadow 160ms ease;
-  backdrop-filter: blur(20px);
+    transform 190ms cubic-bezier(0.2, 1, 0.34, 1),
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 220ms ease,
+    filter 180ms ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    0 10px 22px rgba(9, 7, 30, 0.22);
+  text-shadow: none;
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+}
+
+.platform-button::before,
+.platform-button::after {
+  content: none;
 }
 
 .platform-button:hover {
-  transform: translateY(-1px);
-  border-color: rgba(122, 112, 93, 0.22);
+  transform: translateY(-2px);
+  filter: saturate(1.04);
 }
 
 .platform-button[data-platform="green"] {
-  background: rgba(150, 210, 127, 0.62);
+  --chip-bg: rgba(183, 235, 163, 0.72);
+  --chip-border: rgba(111, 168, 87, 0.34);
+  --chip-text: #4d7a42;
 }
 
 .platform-button[data-platform="purple"] {
-  background: rgba(162, 129, 208, 0.58);
+  --chip-bg: rgba(204, 173, 238, 0.72);
+  --chip-border: rgba(128, 99, 178, 0.34);
+  --chip-text: #6c5596;
 }
 
 .platform-button[data-platform="coral"] {
-  background: rgba(245, 140, 151, 0.68);
+  --chip-bg: rgba(255, 157, 168, 0.74);
+  --chip-border: rgba(204, 96, 108, 0.34);
+  --chip-text: #98525b;
 }
 
 .platform-button[data-platform="blue"] {
-  background: rgba(170, 207, 232, 0.72);
+  --chip-bg: rgba(185, 224, 246, 0.78);
+  --chip-border: rgba(93, 154, 190, 0.34);
+  --chip-text: #527c94;
 }
 
 .platform-button[data-platform="yellow"] {
-  background: rgba(255, 213, 111, 0.74);
+  --chip-bg: rgba(255, 225, 143, 0.76);
+  --chip-border: rgba(204, 154, 53, 0.34);
+  --chip-text: #8a6b31;
 }
 
 .platform-button.is-active {
-  color: #241f17;
-  border-color: rgba(122, 112, 93, 0.28);
-  box-shadow: 0 12px 26px rgba(130, 117, 71, 0.12);
+  color: var(--ink);
+  transform: translateY(-2px) scale(1.025);
+  border-color: rgba(83, 62, 54, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    0 10px 22px rgba(103, 78, 68, 0.12),
+    0 0 0 4px rgba(255, 255, 255, 0.56);
+  filter: saturate(1.08);
 }
 
-.platform-button.is-active[data-platform="green"] {
-  background: rgba(150, 210, 127, 0.98);
-}
-
-.platform-button.is-active[data-platform="purple"] {
-  background: rgba(162, 129, 208, 0.98);
-}
-
-.platform-button.is-active[data-platform="coral"] {
-  background: rgba(245, 140, 151, 0.98);
-}
-
-.platform-button.is-active[data-platform="blue"] {
-  background: rgba(170, 207, 232, 0.98);
-}
-
-.platform-button.is-active[data-platform="yellow"] {
-  background: rgba(255, 213, 111, 0.98);
+.platform-button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.95);
+  outline-offset: 4px;
 }
 
 @media (max-width: 800px) {
   .viewer-copy {
     top: 1.2rem;
-    width: min(34rem, calc(100% - 1.4rem));
+    width: min(34rem, calc(100% - 1.2rem));
     gap: 0.45rem;
   }
 
+  .viewer-copy h1 {
+    font-size: clamp(2.6rem, 14vw, 4.2rem);
+  }
+
   .description {
-    font-size: 0.95rem;
+    max-width: 25rem;
+    font-size: 0.94rem;
     line-height: 1.6;
-    max-width: 24rem;
+  }
+
+  .eyebrow {
+    max-width: 100%;
+    min-height: 1.86rem;
+    padding: 0.36rem 0.92rem;
+    font-size: 0.75rem;
   }
 
   .viewer-stage::before {
@@ -223,8 +304,21 @@ body {
   }
 
   .platform-button {
-    padding: 0.7rem 0.92rem;
-    font-size: 0.86rem;
+    min-width: 4.25rem;
+    min-height: 2.55rem;
+    padding: 0.58rem 0.74rem 0.62rem;
+    font-size: 0.8rem;
   }
 
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewer-copy,
+  .platform-button {
+    transition: none;
+  }
+
+  .platform-button.is-active {
+    animation: none;
+  }
 }

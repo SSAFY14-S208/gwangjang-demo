@@ -10,50 +10,56 @@ const viewerEyebrow = document.querySelector(".eyebrow")
 const viewerTitle = document.querySelector(".viewer-copy h1")
 const viewerDescription = document.querySelector(".description")
 
+const overviewView = {
+  angle: 0.51,
+  zoom: 19.2,
+  eyebrow: "망고슬래브 월드 입구",
+  title: "네모닉 월드",
+  description: "원하는 놀이를 골라 색의 판 위로 톡 뛰어들어 보세요.",
+}
+
 const contentViews = {
   fortune: {
     platform: "purple",
     angle: 1.679,
     zoom: 15.6,
-    eyebrow: "하루에 한 번, 네모닉 운세",
+    eyebrow: "보라 티켓 · 오늘의 운세 부스",
     title: "오늘의 운세",
-    description: "생년월일시를 넣고 네모닉이 건네는 오늘의 운세 카드를 받아보는 작은 부스입니다.",
+    description: "생년월일시를 넣고 오늘의 흐름을 살짝 뽑아보는 작은 운세 부스입니다.",
   },
   community: {
     platform: "green",
     angle: -2.794,
     zoom: 15.9,
-    eyebrow: "메모가 쌓이는 공용 벽",
+    eyebrow: "초록 티켓 · 모두의 갤러리",
     title: "커뮤니티 캔버스",
-    description: "출력된 메모와 결과물을 함께 붙이고 감상하는 모두의 갤러리형 캔버스입니다.",
+    description: "메모와 결과물이 벽에 톡톡 붙어 모두의 갤러리가 되는 초록 광장입니다.",
   },
   relay: {
     platform: "coral",
     angle: 0.51,
     zoom: 15.8,
-    eyebrow: "내 그림과 남의 그림이 만나는 협동 놀이",
+    eyebrow: "코랄 티켓 · 이어 그리는 놀이",
     title: "우당탕 릴레이 드로잉",
-    description: "얼굴, 몸통, 다리를 차례로 이어 그려 예상 못 한 캐릭터를 완성하는 릴레이 드로잉입니다.",
+    description: "얼굴, 몸통, 다리를 이어 그려 예상 밖 캐릭터를 완성하는 우당탕 놀이입니다.",
   },
   infinite: {
     platform: "blue",
     angle: -0.904,
     zoom: 15.9,
-    eyebrow: "함께 펼치는 실시간 창작 공간",
+    eyebrow: "파랑 티켓 · 끝없이 펼쳐지는 판",
     title: "무한 캔버스",
-    description: "같은 캔버스 위에서 커서와 드로잉을 실시간으로 공유하고 원하는 영역을 출력합니다.",
+    description: "같은 캔버스 위에서 커서와 드로잉이 함께 뛰노는 실시간 창작 공간입니다.",
   },
   flipbook: {
     platform: "yellow",
     angle: -1.645,
     zoom: 15.9,
-    eyebrow: "프레임을 이어 만드는 짧은 애니메이션",
+    eyebrow: "노랑 티켓 · 움직임 만드는 책",
     title: "플립북",
-    description: "앞 프레임을 가이드로 이어 그리고, 완성된 움직임을 GIF와 출력물로 남기는 콘텐츠입니다.",
+    description: "한 장씩 이어 그린 프레임이 짧고 귀여운 움직임으로 팔랑이는 애니메이션 놀이입니다.",
   },
 }
-const initialContentKey = "fortune"
-
 const assetMaterialStyles = {
   BodyGray: { color: "#e7d6cf", emissive: "#f5ebe6", emissiveIntensity: 0.08 },
   RingSideCream: { color: "#f1ddca", emissive: "#fff5e6", emissiveIntensity: 0.08 },
@@ -85,6 +91,13 @@ const outerBoardMeshes = new Set([
 const witchPlatformPosition = new THREE.Vector3(-6.05, 0.68, -0.64)
 const witchPlatformRotation = -Math.PI / 2
 const witchPlatformHeight = 3.25
+const centerNemonicBaseY = 0.84
+const centerNemonicMaxSize = 2.36
+const centerNemonicPlaceholderMaterialNames = new Set([
+  "CubeLeft",
+  "CubeRight",
+  "CubeTopPink",
+])
 const witchGlowMeshNames = new Set()
 const mnemonicGlassMeshName = "MNEMONIC_outer_translucent_rounded_cube"
 const mnemonicHiddenMeshNames = new Set([
@@ -279,16 +292,21 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.outputColorSpace = THREE.SRGBColorSpace
 
 const scene = new THREE.Scene()
-scene.background = new THREE.Color("#f9f4fb")
-scene.fog = new THREE.Fog("#f9f4fb", 16, 30)
+scene.background = null
+scene.fog = new THREE.Fog("#262449", 18, 34)
 
 const minZoom = 11.5
 const maxZoom = 21
 const cameraHeight = 2.65
 const modelRootVerticalOffset = -0.35
+const normalRotationEase = 0.14
+const normalZoomEase = 0.18
+const viewTransitionRotationEase = 0.048
+const viewTransitionZoomEase = 0.058
+const viewTransitionDurationMs = 2800
 
 const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100)
-let targetZoom = contentViews[initialContentKey].zoom
+let targetZoom = overviewView.zoom
 let currentZoom = targetZoom
 camera.position.set(0, cameraHeight, currentZoom)
 
@@ -306,16 +324,57 @@ const fillLight = new THREE.DirectionalLight("#f2f7ff", 1.2)
 fillLight.position.set(-8, 3, -4)
 scene.add(fillLight)
 
-const glowSphere = new THREE.Mesh(
-  new THREE.SphereGeometry(10, 48, 48),
-  new THREE.MeshBasicMaterial({
-    color: "#ffffff",
-    transparent: true,
-    opacity: 0.18,
-  }),
-)
-glowSphere.position.set(0, 1.2, -8)
-scene.add(glowSphere)
+scene.add(createNightStarField())
+
+function createNightStarField() {
+  const starCount = 150
+  const positions = new Float32Array(starCount * 3)
+  const colors = new Float32Array(starCount * 3)
+  const geometry = new THREE.BufferGeometry()
+  const palette = [
+    new THREE.Color("#fff8dc"),
+    new THREE.Color("#ffffff"),
+    new THREE.Color("#cfe3ff"),
+    new THREE.Color("#ffd9f1"),
+  ]
+
+  for (let index = 0; index < starCount; index += 1) {
+    const seedA = Math.sin((index + 1) * 12.9898) * 43758.5453
+    const seedB = Math.sin((index + 5) * 78.233) * 24634.6345
+    const seedC = Math.sin((index + 11) * 37.719) * 13548.721
+    const x = ((seedA - Math.floor(seedA)) - 0.5) * 30
+    const y = 3.8 + (seedB - Math.floor(seedB)) * 9.5
+    const z = -8 - (seedC - Math.floor(seedC)) * 18
+    const color = palette[index % palette.length]
+
+    positions[index * 3] = x
+    positions[index * 3 + 1] = y
+    positions[index * 3 + 2] = z
+    colors[index * 3] = color.r
+    colors[index * 3 + 1] = color.g
+    colors[index * 3 + 2] = color.b
+  }
+
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3))
+
+  const stars = new THREE.Points(
+    geometry,
+    new THREE.PointsMaterial({
+      size: 0.075,
+      sizeAttenuation: true,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.86,
+      depthWrite: false,
+      fog: false,
+    }),
+  )
+  stars.name = "NightStarField"
+  stars.renderOrder = -10
+
+  return stars
+}
 
 const pedestal = new THREE.Mesh(
   new THREE.CylinderGeometry(4.5, 5.5, 0.25, 96),
@@ -332,13 +391,17 @@ const modelRoot = new THREE.Group()
 scene.add(modelRoot)
 
 let asset = null
-let targetRotation = contentViews[initialContentKey].angle
+let targetRotation = overviewView.angle
 let currentRotation = targetRotation
 let isDragging = false
 let lastPointerX = 0
+let pointerDownX = 0
+let pointerDownY = 0
+let clickCandidate = false
 let lastInteractionAt = 0
-let selectedContentKey = initialContentKey
+let selectedContentKey = null
 let contentCopySwapTimer = null
+let viewTransitionUntil = 0
 let witchAnimation = null
 let isWitchHovered = false
 let pointerInCanvas = false
@@ -360,6 +423,7 @@ loader.load("/models/pastel_platform.glb", (gltf) => {
   const scale = 8.9 / maxDimension
   asset.scale.setScalar(scale)
 
+  const centerPlaceholderMeshes = []
   asset.traverse((child) => {
     if (child.isMesh) {
       child.castShadow = false
@@ -372,12 +436,18 @@ loader.load("/models/pastel_platform.glb", (gltf) => {
         child.visible = false
         return
       }
+      if (isCenterNemonicPlaceholder(child)) {
+        centerPlaceholderMeshes.push(child)
+        return
+      }
       applyModelPalette(child)
     }
   })
+  centerPlaceholderMeshes.forEach(removeLoadedMesh)
 
   asset.add(createOrganicBoardGroup())
   asset.add(createRaisedCenterDisk())
+  addCenterNemonicAsset(asset)
   addWitchToPurplePlatform(asset)
   modelRoot.add(asset)
 })
@@ -398,6 +468,19 @@ function setActiveButton(contentKey) {
   platformButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.content === contentKey)
   })
+}
+
+function rotateToAngle(nextAngle) {
+  const shortestDelta = normalizeAngle(nextAngle - currentRotation)
+  targetRotation = currentRotation + shortestDelta
+}
+
+function startViewTransition(immediate = false) {
+  viewTransitionUntil = immediate ? 0 : performance.now() + viewTransitionDurationMs
+}
+
+function cancelViewTransition() {
+  viewTransitionUntil = 0
 }
 
 function updateContentCopy(view, immediate = false) {
@@ -421,7 +504,7 @@ function updateContentCopy(view, immediate = false) {
   applyCopy()
   contentCopySwapTimer = window.setTimeout(() => {
     viewerCopy?.classList.remove("is-swapping")
-  }, 180)
+  }, 360)
 }
 
 function selectContent(contentKey, immediate = false) {
@@ -431,7 +514,17 @@ function selectContent(contentKey, immediate = false) {
   selectedContentKey = contentKey
   setActiveButton(contentKey)
   updateContentCopy(view, immediate)
+  rotateToAngle(view.angle)
   targetZoom = THREE.MathUtils.clamp(view.zoom, minZoom, maxZoom)
+  startViewTransition(immediate)
+}
+
+function selectOverview(immediate = false) {
+  selectedContentKey = null
+  setActiveButton(null)
+  updateContentCopy(overviewView, immediate)
+  targetZoom = THREE.MathUtils.clamp(overviewView.zoom, minZoom, maxZoom)
+  startViewTransition(immediate)
 }
 
 function markInteraction() {
@@ -466,10 +559,17 @@ function updateWitchHoverFromPointer() {
     return
   }
 
+  setWitchHovered(isPointerOverWitch())
+}
+
+function isPointerOverWitch() {
+  if (!witchAnimation || !pointerInCanvas) return false
+
   camera.updateMatrixWorld()
   modelRoot.updateMatrixWorld(true)
   raycaster.setFromCamera(pointer, camera)
-  setWitchHovered(raycaster.intersectObjects(witchAnimation.hoverTargets, true).length > 0)
+
+  return raycaster.intersectObjects(witchAnimation.hoverTargets, true).length > 0
 }
 
 function updateWitchHover(event) {
@@ -485,6 +585,10 @@ function clearWitchHover() {
 function onPointerDown(event) {
   isDragging = true
   lastPointerX = event.clientX
+  pointerDownX = event.clientX
+  pointerDownY = event.clientY
+  clickCandidate = true
+  cancelViewTransition()
   markInteraction()
   setWitchHovered(false)
   canvas.classList.add("is-dragging")
@@ -497,15 +601,36 @@ function onPointerMove(event) {
   }
 
   const deltaX = event.clientX - lastPointerX
+  const totalMove = Math.hypot(event.clientX - pointerDownX, event.clientY - pointerDownY)
   lastPointerX = event.clientX
+  if (totalMove > 6) {
+    clickCandidate = false
+  }
   targetRotation += deltaX * 0.008
   markInteraction()
   setWitchHovered(false)
 }
 
 function endDrag(event) {
+  const wasClick = Boolean(
+    event
+    && clickCandidate
+    && Math.hypot(event.clientX - pointerDownX, event.clientY - pointerDownY) <= 6,
+  )
+
   isDragging = false
   canvas.classList.remove("is-dragging")
+
+  if (wasClick) {
+    updatePointerPosition(event)
+    if (isPointerOverWitch()) {
+      selectContent("fortune")
+      markInteraction()
+      setWitchHovered(true)
+      return
+    }
+  }
+
   if (event) {
     updateWitchHover(event)
   }
@@ -513,6 +638,7 @@ function endDrag(event) {
 
 function onWheel(event) {
   event.preventDefault()
+  cancelViewTransition()
   targetZoom = THREE.MathUtils.clamp(targetZoom + event.deltaY * 0.008, minZoom, maxZoom)
   markInteraction()
 }
@@ -520,12 +646,7 @@ function onWheel(event) {
 function onPlatformButtonClick(event) {
   const button = event.currentTarget
   const contentKey = button.dataset.content
-  const view = contentViews[contentKey]
-  const nextAngle = view?.angle ?? Number(button.dataset.angle)
-  const shortestDelta = normalizeAngle(nextAngle - currentRotation)
 
-  // Rotate smoothly from the current pose to the requested platform view.
-  targetRotation = currentRotation + shortestDelta
   markInteraction()
   selectContent(contentKey)
 }
@@ -591,6 +712,74 @@ function createRaisedCenterDisk() {
   disk.renderOrder = 20
 
   return disk
+}
+
+function isCenterNemonicPlaceholder(mesh) {
+  if (mesh.name === "CenterCube") return true
+
+  return getMeshMaterials(mesh).some((material) => (
+    centerNemonicPlaceholderMaterialNames.has(material.name)
+  ))
+}
+
+function removeLoadedMesh(mesh) {
+  mesh.parent?.remove(mesh)
+  mesh.geometry?.dispose()
+  getMeshMaterials(mesh).forEach((material) => material.dispose?.())
+}
+
+function addCenterNemonicAsset(parent) {
+  loader.load("/models/nemonic-custom.glb", (gltf) => {
+    const model = gltf.scene
+    model.name = "CenterNemonicAsset"
+    model.updateMatrixWorld(true)
+
+    const box = new THREE.Box3().setFromObject(model)
+    const size = new THREE.Vector3()
+    const center = new THREE.Vector3()
+    box.getSize(size)
+    box.getCenter(center)
+
+    const maxDimension = Math.max(size.x, size.y, size.z)
+    const scale = centerNemonicMaxSize / maxDimension
+    model.scale.setScalar(scale)
+    model.position.set(
+      -center.x * scale,
+      centerNemonicBaseY - box.min.y * scale,
+      -center.z * scale,
+    )
+
+    model.traverse((child) => {
+      if (!child.isMesh) return
+
+      child.castShadow = false
+      child.receiveShadow = false
+      child.renderOrder = 31
+      prepareCenterNemonicMesh(child)
+    })
+
+    parent.add(model)
+  }, undefined, (error) => {
+    console.warn("nemonic-custom asset load failed", error)
+  })
+}
+
+function prepareCenterNemonicMesh(mesh) {
+  if (!mesh.material) return
+
+  mesh.material = Array.isArray(mesh.material)
+    ? mesh.material.map((material) => material.clone())
+    : mesh.material.clone()
+
+  getMeshMaterials(mesh).forEach((material) => {
+    material.roughness = Math.min(material.roughness ?? 0.86, 0.9)
+    material.metalness = material.metalness ?? 0
+
+    if (material.emissive && material.name?.includes("LED")) {
+      material.emissive.set("#e6fbff")
+      material.emissiveIntensity = 0.2
+    }
+  })
 }
 
 function createOrganicBoardGroup() {
@@ -1530,7 +1719,7 @@ platformButtons.forEach((button) => {
   button.addEventListener("click", onPlatformButtonClick)
 })
 
-selectContent(initialContentKey, true)
+selectOverview(true)
 resize()
 
 const clock = new THREE.Clock()
@@ -1539,17 +1728,21 @@ function tick() {
   const elapsed = clock.getElapsedTime()
   const now = performance.now()
   const isWitchRotationPaused = isWitchHovered || (witchAnimation?.hoverProgress ?? 0) > 0.02
+  const isViewTransitioning = now < viewTransitionUntil
   const timeSinceInteraction = now - lastInteractionAt
 
   if (isWitchRotationPaused) {
     targetRotation = currentRotation
     lastInteractionAt = now
-  } else if (!isDragging && timeSinceInteraction > 1800) {
+  } else if (!isDragging && !isViewTransitioning && timeSinceInteraction > 1800) {
     targetRotation += 0.00115
   }
 
-  currentRotation += (targetRotation - currentRotation) * 0.14
-  currentZoom += (targetZoom - currentZoom) * 0.18
+  const rotationEase = isViewTransitioning ? viewTransitionRotationEase : normalRotationEase
+  const zoomEase = isViewTransitioning ? viewTransitionZoomEase : normalZoomEase
+
+  currentRotation += (targetRotation - currentRotation) * rotationEase
+  currentZoom += (targetZoom - currentZoom) * zoomEase
 
   modelRoot.rotation.y = currentRotation
   modelRoot.rotation.x = 0
